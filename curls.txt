@@ -1,0 +1,18 @@
+curl -X POST http://flexbone.pagekite.me/trigger-call \
+-H "Content-Type: application/json" \
+-d '{"toNumber": "4043171792"}'
+
+curl -X POST http://flexbone.pagekite.me/nimbus-call \
+-H "Content-Type: application/json" \
+-H "x-api-key: nimbus-api-key-1" \
+-d '{
+  "toNumber": "4043171792",
+  "payorName": "bcbs-az",
+  "NPI": "1720072903",
+  "patientFirstName": "Sam",
+  "patientLastName": "Smith",
+  "subscriberId": "999082038",
+  "TIN": "860928831",
+  "callbackNumber": "9034833047",
+  "dateOfBirth": "08-11-1941"
+}'

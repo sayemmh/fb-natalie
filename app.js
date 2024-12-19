@@ -10,7 +10,7 @@ const ExpressWs = require('express-ws');
 const { GptService } = require('./services/gpt-service');
 const { StreamService } = require('./services/stream-service');
 const { TranscriptionService } = require('./services/transcription-service');
-const { TextToSpeechService } = require('./services/tts-service');
+const { TextToSpeechService } = require('./services/elevenlabs-tts-service');
 const { recordingService } = require('./services/recording-service');
 
 

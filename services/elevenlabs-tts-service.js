@@ -1,10 +1,6 @@
 require("dotenv").config();
 const { Buffer } = require("node:buffer");
 const EventEmitter = require("events");
-const { ElevenLabsClient } = require("elevenlabs"); // Import ElevenLabs Client
-
-// Initialize ElevenLabs Client
-const client = new ElevenLabsClient({ apiKey: process.env.ELEVENLABS_API_KEY });
 
 class TextToSpeechService extends EventEmitter {
   constructor() {
@@ -21,32 +17,31 @@ class TextToSpeechService extends EventEmitter {
     }
 
     try {
-      // Use ElevenLabs to generate speech from text
-      const audioStream = await client.generate({
-        voice: "Rachel", // Choose the voice you'd like to use
-        model_id: "eleven_turbo_v2", // Specify model
-        text: partialResponse, // The text to convert to speech
-      });
-
-      const chunks = [];
-      for await (const chunk of audioStream) {
-        chunks.push(chunk); // Collect all audio chunks
-      }
-
-      // Concatenate the chunks into a single audio buffer
-      const content = Buffer.concat(chunks);
-      const base64String = content.toString("base64"); // Convert to base64 string
-
-      // Emit the speech event with necessary data
-      this.emit(
-        "speech",
-        partialResponseIndex,
-        base64String,
-        partialResponse,
-        interactionCount
+      const response = await fetch(
+        `https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM/stream?output_format=ulaw_8000&optimize_streaming_latency=3`,
+        {
+          method: 'POST',
+          headers: {
+            'xi-api-key': process.env.ELEVENLABS_API_KEY,
+            'Content-Type': 'application/json',
+            accept: 'audio/wav',
+          },
+          body: JSON.stringify({
+            model_id: process.env.ELEVENLABS_MODEL_ID,
+            text: partialResponse,
+          }),
+        }
       );
+      
+      if (response.status === 200) {
+        const audioArrayBuffer = await response.arrayBuffer();
+        this.emit('speech', partialResponseIndex, Buffer.from(audioArrayBuffer).toString('base64'), partialResponse, interactionCount);
+      } else {
+        console.log('Eleven Labs Error:');
+        console.log(response);
+      }
     } catch (err) {
-      console.error("Error occurred in TextToSpeech service");
+      console.error('Error occurred in XI LabsTextToSpeech service');
       console.error(err);
     }
   }

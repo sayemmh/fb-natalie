@@ -55,6 +55,7 @@ app.post('/nimbus-call', validateApiKey, async (req, res) => {
     TIN,
     callbackNumber,
     dateOfBirth,
+    systemPrompt,
   } = req.body;
 
   // Validate that all required fields are present
@@ -85,11 +86,19 @@ app.post('/nimbus-call', validateApiKey, async (req, res) => {
 
   try {
     // Log the parameters to a file
-    const filePath = path.join(__dirname, 'services', 'prompts', 'params.txt');
+    const paramsFilePath = path.join(__dirname, 'services', 'prompts', 'params.txt');
     const paramsContent = JSON.stringify(req.body, null, 2);
 
-    fs.writeFileSync(filePath, paramsContent, 'utf8');
-    console.log(`[Sayem] Parameters written to ${filePath}`);
+    fs.writeFileSync(paramsFilePath, paramsContent, 'utf8');
+    console.log(`[Sayem] Parameters written to ${paramsFilePath}`);
+
+    // Log the custom system promps to a file
+    if (systemPrompt) {
+      const systemPromptFilePath = path.join(__dirname, 'services', 'prompts', 'bcbs_live.txt');
+
+      fs.writeFileSync(systemPromptFilePath, systemPrompt);
+      console.log(`[Sayem] Custom System Promps written to ${systemPromptFilePath}`);
+    }
 
     console.log(`[Sayem] Triggering outbound call to ${toNumber}`);
     await makeOutBoundCall(toNumber); // Pass the number to the outbound call function
